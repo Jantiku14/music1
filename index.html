@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Note for You</title>
+    <style>
+        /* --- Google Fonts --- */
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Great+Vibes&display=swap');
+
+        /* --- CSS Variables & Reset --- */
+        :root {
+            --bg-color: #FDFBF7; /* Cream */
+            --text-color: #5D5D5D; /* Soft Grey */
+            --accent-pink: #EAC8C8; /* Blush */
+            --accent-dark-pink: #D4A5A5;
+            --paper-color: #FFFAF0; /* Floral White */
+            --envelope-color: #F5EBE0;
+            --font-hand: 'Great Vibes', cursive;
+            --font-body: 'Cormorant Garamond', serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-body);
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden; /* Prevent scrollbars due to petals */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* --- Background Petals --- */
+        #petal-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* Let clicks pass through */
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .petal {
+            position: absolute;
+            background-color: var(--accent-pink);
+            border-radius: 150% 0 150% 0;
+            opacity: 0.6;
+            animation: fall linear infinite;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translate(0, -10vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translate(20vw, 110vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* --- Main Layout --- */
+        main {
+            z-index: 10;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+        }
+
+        /* --- Envelope Structure --- */
+        .envelope-wrapper {
+            position: relative;
+            width: 300px;
+            height: 200px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            margin-bottom: 40px;
+        }
+
+        .envelope-wrapper:hover {
+            transform: translateY(-5px);
+        }
+
+        .envelope {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background-color: var(--envelope-color);
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        /* The Flap (Triangle) */
+        .flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 150px solid transparent;
+            border-right: 150px solid transparent;
+            border-top: 110px solid var(--accent-pink); /* Flap color */
+            transform-origin: top;
+            transition: transform 0.6s ease 0.2s, z-index 0.2s;
+            z-index: 5;
+            border-radius: 10px 10px 0 0;
+        }
+
+        /* The Pocket (Front of envelope) */
+        .pocket {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 150px solid var(--envelope-color);
+            border-right: 150px solid var(--envelope-color);
+            border-bottom: 100px solid var(--accent-dark-pink); /* Pocket inside color */
+            border-radius: 0 0 10px 10px;
+            z-index: 4;
+        }
+
+        /* The Letter inside */
+        .letter {
+            position: absolute;
+            top: 10px;
+            left: 15px;
+            width: 270px;
+            height: 180px;
+            background: var(--paper-color);
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.8s ease 0.8s; /* Delay until flap opens */
+            z-index: 3;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* Open State Classes */
+        .envelope-wrapper.open .flap {
+            transform: rotateX(180deg);
+            z-index: 1; /* Moves behind the letter */
+        }
+
+        .envelope-wrapper.open .letter {
+            transform: translateY(-120px);
+            z-index: 6; /* Moves on top */
+        }
+
+        /* --- Typography & Content --- */
+        .letter h2 {
+            font-family: var(--font-hand);
+            color: #D48A8A;
+            font-size: 2rem;
+            margin-bottom: 10px;
+            opacity: 0; /* Hidden initially */
+            animation: fadeIn 1s ease forwards 1.5s;
+        }
+
+        .typewriter-text {
+            font-size: 1rem; /* Slightly smaller to fit more text */
+            line-height: 1.5;
+            color: var(--text-color);
+            min-height: 100px; /* Increased height for extra line */
+        }
+        
+        .quote {
+            font-style: italic;
+            margin-top: 5px;
+            font-size: 0.95rem;
+            color: #888;
+        }
+
+        /* Spotify Button */
+        .spotify-btn {
+            margin-top: 15px; /* Adjusted margin */
+            padding: 8px 16px;
+            background-color: #1DB954;
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-family: var(--font-body);
+            font-weight: 600;
+            font-size: 0.85rem; /* Slightly smaller button */
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.5s ease;
+            box-shadow: 0 4px 15px rgba(29, 185, 84, 0.3);
+        }
+
+        .spotify-btn:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 6px 20px rgba(29, 185, 84, 0.4);
+        }
+
+        .spotify-btn.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- Interactive Flower --- */
+        .trigger-flower {
+            font-size: 3rem;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            margin-top: 20px;
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1));
+            animation: breathe 3s infinite ease-in-out;
+        }
+
+        .trigger-flower:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        /* --- Music Toggle --- */
+        .music-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid var(--accent-pink);
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 100;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+        }
+
+        .music-toggle:hover {
+            background: white;
+        }
+
+        .music-icon {
+            width: 24px;
+            height: 24px;
+            fill: var(--accent-dark-pink);
+        }
+
+        /* --- Responsive --- */
+        @media (max-width: 400px) {
+            .envelope-wrapper {
+                width: 260px;
+                height: 180px;
+            }
+            .flap {
+                border-left-width: 130px;
+                border-right-width: 130px;
+                border-top-width: 100px;
+            }
+            .pocket {
+                border-left-width: 130px;
+                border-right-width: 130px;
+                border-bottom-width: 90px;
+            }
+            .letter {
+                width: 240px;
+                height: 160px;
+                left: 10px;
+            }
+            .letter h2 { font-size: 1.5rem; }
+            .typewriter-text { font-size: 0.9rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background Petals Container -->
+    <div id="petal-container"></div>
+
+    <!-- Audio Element (Using a royalty-free gentle piano track) -->
+    <!-- Note: If this specific link fails, replace src with any direct mp3 link -->
+    <audio id="bg-music" loop>
+        <source src="https://cdn.pixabay.com/download/audio/2022/03/10/audio_5b34213566.mp3?filename=piano-moment-11675.mp3" type="audio/mpeg">
+    </audio>
+
+    <main>
+        <!-- The Envelope -->
+        <div class="envelope-wrapper" id="envelope" onclick="openEnvelope()">
+            <div class="flap"></div>
+            <div class="pocket"></div>
+            <div class="letter">
+                <h2>Hey You,</h2>
+                <div class="typewriter-text" id="typewriter"></div>
+                <a href="https://open.spotify.com/playlist/70R1tJkevtksvDJrGNlgnI?si=8a106e48ce1a4aaf&pt=edc72ea6e6fa5e1eda8beba979c3d44a" target="_blank" class="spotify-btn" id="spotify-btn">
+                    Open your playlist 🎧
+                </a>
+            </div>
+        </div>
+
+        <!-- Interactive Flower Trigger -->
+        <div class="trigger-flower" onclick="openEnvelope()" title="Click to open">
+            🌹
+        </div>
+        
+        <p style="margin-top: 15px; font-size: 0.9rem; opacity: 0.7; font-style: italic;">Click the rose to read</p>
+    </main>
+
+    <!-- Music Toggle Button -->
+    <button class="music-toggle" id="music-btn" onclick="toggleMusic()" aria-label="Toggle Music">
+        <!-- Music Note Icon SVG -->
+        <svg class="music-icon" id="music-on-icon" viewBox="0 0 24 24">
+            <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+        </svg>
+        <!-- Mute Icon SVG (Hidden by default) -->
+        <svg class="music-icon" id="music-off-icon" viewBox="0 0 24 24" style="display:none;">
+            <path d="M4.27 3L3 4.27 9 10.27V17c0 2.21 1.79 4 4 4 .88 0 1.68-.29 2.34-.77L19.73 21 21 19.73 4.27 3zM14 17c0 1.1-.9 2-2 2s-2-.9-2-2v-3.17l4.77 4.77c-.25.23-.56.4-.9.4-.48 0-.91-.18-1.25-.46-.13.12-.26.24-.38.37.52.48 1.2.77 1.96.77 1.66 0 3-1.34 3-3h-3.2zM14 7V3h-4v4.18l2 2V7h2z"/>
+        </svg>
+    </button>
+
+    <script>
+        /* --- 1. Floating Petals Animation --- */
+        const petalContainer = document.getElementById('petal-container');
+        const petalCount = 30; // Number of petals
+
+        function createPetals() {
+            for (let i = 0; i < petalCount; i++) {
+                const petal = document.createElement('div');
+                petal.classList.add('petal');
+                
+                // Random positioning and sizing
+                const size = Math.random() * 10 + 5 + 'px'; // 5px to 15px
+                petal.style.width = size;
+                petal.style.height = size;
+                petal.style.left = Math.random() * 100 + 'vw';
+                petal.style.backgroundColor = `rgba(234, 200, 200, ${Math.random() * 0.5 + 0.2})`;
+                
+                // Random animation duration and delay
+                const duration = Math.random() * 5 + 5 + 's'; // 5s to 10s
+                const delay = Math.random() * 5 + 's';
+                petal.style.animationDuration = duration;
+                petal.style.animationDelay = delay;
+
+                petalContainer.appendChild(petal);
+            }
+        }
+        createPetals();
+
+        /* --- 2. Envelope & Typewriter Logic --- */
+        let isOpened = false;
+        const envelope = document.getElementById('envelope');
+        const typewriterElement = document.getElementById('typewriter');
+        const spotifyBtn = document.getElementById('spotify-btn');
+        
+        // The message to type
+        const messageLines = [
+            "A little something from the heart 💌",
+            "\"Notes and beats, wrapped up with thoughts of you.\"",
+            "ps i hope you like it because my music taste is quite , abstract"
+        ];
+
+        function openEnvelope() {
+            if (isOpened) return; // Prevent re-triggering
+            isOpened = true;
+
+            // 1. Open Envelope Animation
+            envelope.classList.add('open');
+
+            // 2. Start Typewriter after envelope opens (1.5s delay)
+            setTimeout(() => {
+                typeWriter(0, 0);
+            }, 1500);
+        }
+
+        function typeWriter(lineIndex, charIndex) {
+            if (lineIndex < messageLines.length) {
+                const currentLine = messageLines[lineIndex];
+                
+                if (charIndex < currentLine.length) {
+                    // Append next character
+                    typewriterElement.innerHTML += currentLine.charAt(charIndex);
+                    // Randomize typing speed for "human" feel
+                    setTimeout(() => typeWriter(lineIndex, charIndex + 1), 50);
+                } else {
+                    // Line finished, add line break and move to next line
+                    typewriterElement.innerHTML += '<br>';
+                    setTimeout(() => typeWriter(lineIndex + 1, 0), 300);
+                }
+            } else {
+                // All text finished, show button
+                setTimeout(() => {
+                    spotifyBtn.classList.add('visible');
+                }, 500);
+            }
+        }
+
+        /* --- 3. Music Control --- */
+        const audio = document.getElementById('bg-music');
+        const musicBtn = document.getElementById('music-btn');
+        const iconOn = document.getElementById('music-on-icon');
+        const iconOff = document.getElementById('music-off-icon');
+        let isPlaying = false;
+
+        function toggleMusic() {
+            if (isPlaying) {
+                audio.pause();
+                iconOn.style.display = 'none';
+                iconOff.style.display = 'block';
+            } else {
+                // User interaction required to start audio context usually
+                audio.play().then(() => {
+                    iconOn.style.display = 'block';
+                    iconOff.style.display = 'none';
+                }).catch(e => {
+                    console.log("Audio play failed (user interaction required first):", e);
+                    alert("Please interact with the page first (click anywhere) to play audio.");
+                });
+            }
+            isPlaying = !isPlaying;
+        }
+    </script>
+</body>
+</html>
